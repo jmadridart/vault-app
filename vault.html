@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vault — Hidden Spots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf7f2;
+  --card: #ffffff;
+  --border: #e8ddd0;
+  --border-light: #f0e8dc;
+  --beige: #f0e8dc;
+  --beige-deep: #e0d4c4;
+  --text: #2a1f14;
+  --text-med: #7a6558;
+  --text-light: #b0a090;
+  --terra: #c4522a;
+  --terra-light: rgba(196,82,42,0.09);
+  --terra-border: rgba(196,82,42,0.22);
+  --green: #4a7c4e;
+  --green-light: rgba(74,124,78,0.09);
+  --green-border: rgba(74,124,78,0.22);
+  --gold: #b8860b;
+  --gold-light: rgba(184,134,11,0.09);
+  --gold-border: rgba(184,134,11,0.22);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  font-family: 'Syne', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.6s ease;
+}
+#splash .logo-icon {
+  width: 80px; height: 80px;
+  background: var(--terra);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 32px rgba(196,82,42,0.3);
+  animation: logoFloat 2s ease-in-out infinite;
+}
+@keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+#splash h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px; font-weight: 700;
+  color: var(--text); letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+#splash p {
+  font-size: 11px; color: var(--text-light);
+  letter-spacing: 0.25em; text-transform: uppercase;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── APP SHELL ── */
+#app { display: none; min-height: 100vh; padding-bottom: 80px; }
+#app.visible { display: block; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── BOTTOM NAV ── */
+#nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: white;
+  border-top: 1.5px solid var(--border);
+  display: flex;
+  height: 70px;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(42,31,20,0.06);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; background: none; border: none;
+  cursor: pointer; padding: 8px 0;
+  transition: all 0.2s;
+}
+.nav-icon { font-size: 20px; color: var(--text-light); transition: color 0.2s; }
+.nav-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-light); transition: color 0.2s;
+}
+.nav-btn.active .nav-icon,
+.nav-btn.active .nav-label { color: var(--terra); }
+
+/* ── SCREENS ── */
+.screen { display: none; animation: fadeIn 0.3s ease; }
+.screen.active { display: block; }
+
+/* ── HEADER ── */
+.screen-header {
+  padding: 20px 20px 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.screen-subtitle {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text-light); margin-bottom: 4px;
+}
+.screen-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px; font-weight: 700; color: var(--text);
+  line-height: 1;
+}
+
+/* ── CITY BUTTON ── */
+#city-btn {
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+#city-btn span:first-child {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 700; color: var(--text);
+}
+#city-btn .chevron { color: var(--terra); font-size: 14px; }
+
+/* ── HEADER RIGHT ── */
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+/* ── VEGAN TOGGLE ── */
+.vegan-toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.toggle-track {
+  width: 44px; height: 25px; border-radius: 100px;
+  background: var(--beige-deep); border: 1.5px solid var(--beige-deep);
+  position: relative; transition: all 0.25s; cursor: pointer;
+}
+.toggle-track.on { background: var(--green); border-color: var(--green-border); }
+.toggle-thumb {
+  width: 19px; height: 19px; border-radius: 50%;
+  background: white; position: absolute; top: 1px; left: 2px;
+  transition: left 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle-track.on .toggle-thumb { left: 21px; }
+.vegan-toggle-label { font-size: 8px; font-weight: 700; letter-spacing: 0.1em; color: var(--text-light); }
+.vegan-toggle-label.on { color: var(--green); }
+
+/* ── KEYS BOX ── */
+.keys-box {
+  background: var(--terra); border-radius: 12px;
+  padding: 8px 12px; text-align: center;
+  box-shadow: 0 4px 12px rgba(196,82,42,0.25);
+  min-width: 44px;
+}
+.keys-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 700; color: white; display: block; line-height: 1;
+}
+.keys-label { font-size: 8px; font-weight: 700; letter-spacing: 0.1em; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+
+/* ── PROGRESS ── */
+.progress-section { padding: 12px 20px 0; }
+.progress-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progress-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+.progress-count { font-size: 10px; font-weight: 700; color: var(--terra); }
+.progress-bg { background: var(--beige); border-radius: 100px; height: 5px; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, var(--terra), #e06030); height: 100%; border-radius: 100px; transition: width 0.6s ease; }
+
+/* ── SEARCH ── */
+.search-wrap { margin: 12px 20px 0; position: relative; }
+.search-wrap input {
+  width: 100%; background: white; border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 12px 16px 12px 38px;
+  font-family: 'Syne', sans-serif; font-size: 13px; color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--terra); }
+.search-wrap input::placeholder { color: var(--text-light); }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 14px; pointer-events: none; }
+
+/* ── FILTERS ── */
+.filter-row { display: flex; gap: 7px; padding: 12px 20px 0; overflow-x: auto; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 100px; padding: 6px 13px;
+  font-size: 10px; font-weight: 700; color: var(--text-med);
+  cursor: pointer; white-space: nowrap; letter-spacing: 0.04em;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.filter-chip.active { background: var(--terra-light); border-color: var(--terra-border); color: var(--terra); }
+.filter-chip.vegan { border-color: var(--green-border); color: var(--green); background: rgba(74,124,78,0.05); }
+.filter-chip.vegan.active { background: var(--green-light); }
+
+/* ── BANNERS ── */
+.vegan-banner {
+  margin: 10px 20px 0;
+  background: var(--green-light); border: 1px solid var(--green-border);
+  border-radius: 12px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; color: var(--green);
+}
+.free-banner {
+  margin: 10px 20px 0;
+  background: var(--terra-light); border: 1px solid var(--terra-border);
+  border-radius: 12px; padding: 10px 14px;
+  font-size: 12px; color: var(--text-med);
+}
+.free-banner a { color: var(--terra); font-weight: 700; cursor: pointer; text-decoration: none; }
+
+/* ── SPOT CARDS ── */
+.spot-list { padding: 16px 20px 20px; }
+.section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+
+.spot-card {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 20px; padding: 16px; margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+  position: relative; overflow: hidden;
+}
+.spot-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(42,31,20,0.09); border-color: var(--beige-deep); }
+.spot-card.featured { border-color: var(--terra-border); background: linear-gradient(135deg,#fff9f7,white); }
+.spot-card.vegan { border-color: var(--green-border); background: linear-gradient(135deg,#f7faf7,white); }
+.spot-card.locked { opacity: 0.65; }
+
+.lock-overlay {
+  position: absolute; inset: 0;
+  background: rgba(250,247,242,0.93);
+  border-radius: 20px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; backdrop-filter: blur(3px);
+}
+.lock-overlay-emoji { font-size: 26px; }
+.lock-overlay-text { font-size: 11px; font-weight: 600; color: var(--text-med); }
+.lock-overlay-btn {
+  background: var(--terra); color: white; border: none;
+  border-radius: 100px; padding: 7px 18px;
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; margin-top: 4px;
+  transition: all 0.2s;
+}
+.lock-overlay-btn:hover { background: #b04525; }
+
+.spot-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.spot-emoji {
+  width: 46px; height: 46px; background: var(--beige);
+  border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+  border: 1.5px solid var(--beige-deep);
+}
+.spot-emoji.vegan { background: var(--green-light); border-color: var(--green-border); }
+.spot-info { flex: 1; min-width: 0; }
+.tag-row { display: flex; gap: 5px; margin-bottom: 4px; flex-wrap: wrap; align-items: center; }
+.cat-tag { background: var(--terra-light); border: 1px solid var(--terra-border); border-radius: 100px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: var(--terra); }
+.vegan-tag { background: var(--green-light); border: 1px solid var(--green-border); border-radius: 100px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: var(--green); }
+.featured-tag { background: var(--gold-light); border: 1px solid var(--gold-border); border-radius: 100px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: var(--gold); }
+.spot-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 2px; }
+.spot-neighborhood { font-size: 11px; color: var(--text-med); }
+.save-btn-inline { background: none; border: none; cursor: pointer; font-size: 20px; color: var(--text-light); flex-shrink: 0; padding: 4px; transition: color 0.2s; }
+.save-btn-inline.saved { color: var(--terra); }
+.spot-desc { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--text-med); line-height: 1.6; font-style: italic; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.spot-footer { display: flex; justify-content: space-between; }
+.spot-tier, .spot-saves { font-size: 10px; color: var(--text-light); }
+
+/* ── FEATURED HERO ── */
+.featured-hero {
+  background: white; border: 2px solid var(--terra-border);
+  border-radius: 20px; padding: 16px; margin-bottom: 16px;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(196,82,42,0.09);
+  transition: all 0.2s;
+}
+.featured-hero:hover { transform: translateY(-2px); }
+
+/* ── MAP SCREEN ── */
+#map-screen { padding: 20px; }
+.map-container {
+  border-radius: 20px; overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 16px rgba(42,31,20,0.08);
+  margin-bottom: 16px; position: relative;
+  height: 340px; background: #f5efe6;
+}
+.map-svg { width: 100%; height: 100%; }
+.map-pin { cursor: pointer; transition: transform 0.2s; }
+.map-pin:hover { transform: scale(1.15); }
+.pin-circle { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+.spot-cards-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.spot-cards-row::-webkit-scrollbar { display: none; }
+.mini-card {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 14px; padding: 12px; flex-shrink: 0; width: 140px;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+}
+.mini-card:hover { transform: translateY(-2px); border-color: var(--beige-deep); }
+.mini-card-emoji { font-size: 22px; margin-bottom: 6px; }
+.mini-card-name { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 2px; }
+.mini-card-hood { font-size: 10px; color: var(--text-med); }
+
+/* ── SPOT DETAIL ── */
+#detail-screen { display: none; }
+#detail-screen.active { display: block; }
+.detail-header { display: flex; align-items: center; gap: 12px; padding: 20px 20px 0; }
+.back-btn {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 50%; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; color: var(--text-med);
+  flex-shrink: 0; transition: all 0.2s;
+}
+.back-btn:hover { border-color: var(--terra); color: var(--terra); }
+.detail-neighborhood { flex: 1; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); text-align: center; }
+.detail-hero {
+  margin: 16px 20px 0;
+  height: 170px; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 72px; border: 1.5px solid var(--terra-border);
+  background: linear-gradient(135deg, var(--terra-light), var(--beige));
+}
+.detail-hero.vegan { border-color: var(--green-border); background: linear-gradient(135deg, var(--green-light), var(--beige)); }
+.detail-content { padding: 16px 20px 40px; }
+.detail-name { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; color: var(--text); line-height: 1.1; margin-bottom: 6px; }
+.detail-location { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-med); margin-bottom: 16px; }
+.divider { height: 1px; background: var(--border-light); margin: 16px 0; }
+.section-sublabel { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); margin-bottom: 10px; }
+.detail-desc { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text-med); line-height: 1.8; margin-bottom: 16px; }
+.secret-box {
+  background: var(--terra-light); border: 1.5px solid var(--terra-border);
+  border-radius: 16px; padding: 16px; margin-bottom: 16px;
+}
+.secret-box.vegan { background: var(--green-light); border-color: var(--green-border); }
+.secret-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--terra); margin-bottom: 10px; }
+.secret-box.vegan .secret-label { color: var(--green); }
+.secret-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--text); line-height: 1.8; font-style: italic; }
+.unlock-box {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 24px; text-align: center;
+  margin-bottom: 16px; box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+}
+.unlock-box-emoji { font-size: 28px; margin-bottom: 8px; }
+.unlock-box-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.unlock-box-sub { font-size: 12px; color: var(--text-med); margin-bottom: 16px; }
+.unlock-box-btn { background: var(--terra); color: white; border: none; border-radius: 12px; padding: 13px 24px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.unlock-box-btn:hover { background: #b04525; transform: translateY(-1px); }
+.detail-stats { display: flex; justify-content: space-between; margin-bottom: 16px; }
+.detail-stat { text-align: center; }
+.detail-stat-value { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--terra); display: block; }
+.detail-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+.vegan-verified { display: flex; align-items: center; gap: 10px; background: var(--green-light); border: 1px solid var(--green-border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; font-weight: 600; color: var(--green); }
+.directions-btn { background: var(--terra); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; transition: all 0.2s; }
+.directions-btn:hover { background: #b04525; transform: translateY(-1px); }
+.directions-btn.vegan { background: var(--green); }
+.directions-btn.vegan:hover { background: #3a6a3e; }
+.outline-btn { background: transparent; color: var(--text-med); border: 1.5px solid var(--border); border-radius: 14px; padding: 13px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s; }
+.outline-btn:hover { border-color: var(--beige-deep); color: var(--text); }
+
+/* ── EVENTS ── */
+.events-list { padding: 16px 20px 20px; }
+.event-card {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 18px; padding: 16px; margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+}
+.event-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(42,31,20,0.09); }
+.event-header { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.event-emoji { width: 42px; height: 42px; background: var(--beige); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; border: 1.5px solid var(--beige-deep); }
+.event-info { flex: 1; }
+.event-spot { font-size: 10px; color: var(--text-light); font-weight: 600; letter-spacing: 0.04em; margin-bottom: 3px; }
+.event-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.event-price { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--terra); }
+.event-price-sub { font-size: 10px; color: var(--text-light); }
+.event-desc { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--text-med); line-height: 1.6; font-style: italic; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.event-footer { display: flex; justify-content: space-between; align-items: center; }
+.event-meta { font-size: 11px; color: var(--text-light); }
+.event-spots { font-size: 11px; color: var(--green); font-weight: 600; }
+.event-tag { background: var(--terra-light); border: 1px solid var(--terra-border); border-radius: 100px; padding: 3px 9px; font-size: 9px; font-weight: 700; color: var(--terra); letter-spacing: 0.06em; }
+.event-tag.free-tag { background: var(--green-light); border-color: var(--green-border); color: var(--green); }
+
+/* ── SAVED ── */
+.saved-list { padding: 16px 20px 20px; }
+.empty-state { text-align: center; padding: 60px 0; }
+.empty-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text-light); font-style: italic; margin-bottom: 8px; }
+.empty-sub { font-size: 12px; color: var(--text-light); }
+
+/* ── PROFILE ── */
+.profile-content { padding: 16px 20px 40px; }
+.profile-card {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 20px; padding: 18px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+}
+.profile-avatar {
+  width: 58px; height: 58px; border-radius: 50%;
+  background: var(--beige); border: 2px solid var(--terra);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+.profile-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.profile-since { font-size: 11px; color: var(--text-med); }
+.tier-badge { background: var(--terra-light); border: 1px solid var(--terra-border); border-radius: 8px; padding: 4px 10px; font-size: 9px; font-weight: 800; color: var(--terra); letter-spacing: 0.1em; margin-left: auto; }
+.tier-badge.free { background: var(--green-light); border-color: var(--green-border); color: var(--green); }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-box { background: white; border: 1.5px solid var(--border-light); border-radius: 14px; padding: 14px 10px; text-align: center; }
+.stat-value { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; color: var(--terra); display: block; }
+.stat-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); margin-top: 2px; }
+.earn-list { background: white; border: 1.5px solid var(--border-light); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+.earn-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border-light); }
+.earn-item:last-child { border-bottom: none; }
+.earn-check { font-size: 14px; width: 20px; }
+.earn-action { font-size: 13px; font-weight: 500; color: var(--text-med); flex: 1; }
+.earn-action.done { text-decoration: line-through; color: var(--text-light); }
+.earn-reward { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700; color: var(--terra); }
+.earn-reward.done { color: var(--text-light); }
+.upgrade-btn { background: var(--terra); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s; }
+.upgrade-btn:hover { background: #b04525; transform: translateY(-1px); }
+
+/* ── PRICING SCREEN ── */
+#pricing-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  z-index: 200; overflow-y: auto;
+  display: none; animation: slideUp 0.35s ease;
+}
+#pricing-screen.open { display: block; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.pricing-content { padding: 20px 20px 60px; }
+.pricing-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.plan-box {
+  background: white; border: 1.5px solid var(--border-light);
+  border-radius: 20px; padding: 20px; margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(42,31,20,0.04);
+  position: relative;
+}
+.plan-box.featured { border-color: var(--terra-border); border-width: 2px; }
+.plan-box.green { border-color: var(--green-border); }
+.plan-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.plan-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.plan-sub { font-size: 12px; color: var(--text-med); }
+.plan-price { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--text); text-align: right; }
+.plan-price.terra { color: var(--terra); }
+.plan-price.green { color: var(--green); }
+.plan-period { font-size: 11px; color: var(--text-light); text-align: right; }
+.feature-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border-light); }
+.feature-row:last-child { border-bottom: none; }
+.feature-icon { font-size: 11px; color: var(--terra); width: 16px; flex-shrink: 0; }
+.feature-icon.green { color: var(--green); }
+.feature-text { font-size: 12px; font-weight: 500; color: var(--text-med); line-height: 1.4; }
+.popular-badge { position: absolute; top: -12px; right: 16px; background: var(--terra); color: white; font-size: 9px; font-weight: 800; padding: 4px 12px; border-radius: 100px; letter-spacing: 0.1em; }
+.plan-cta { background: var(--terra); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 14px; transition: all 0.2s; }
+.plan-cta:hover { background: #b04525; transform: translateY(-1px); }
+.plan-cta.green { background: var(--green); }
+.plan-cta.green:hover { background: #3a6a3e; }
+.plan-toggle { display: flex; background: var(--beige); border-radius: 100px; padding: 3px; margin-bottom: 16px; }
+.plan-toggle-opt { flex: 1; text-align: center; padding: 8px; border-radius: 100px; font-size: 12px; font-weight: 700; color: var(--text-med); cursor: pointer; transition: all 0.2s; position: relative; }
+.plan-toggle-opt.active { background: var(--text); color: white; }
+.save-pill { position: absolute; top: -8px; right: 4px; background: var(--terra); color: white; font-size: 8px; font-weight: 800; padding: 2px 7px; border-radius: 100px; }
+.restore-btn { display: block; text-align: center; padding: 12px; font-size: 13px; color: var(--text-med); text-decoration: underline; cursor: pointer; background: none; border: none; width: 100%; font-family: 'Syne', sans-serif; }
+.legal-text { font-size: 10px; color: var(--text-light); text-align: center; line-height: 1.6; padding: 0 20px; }
+
+/* ── CITY PICKER ── */
+#city-picker {
+  position: fixed; inset: 0; background: rgba(250,247,242,0.97);
+  z-index: 300; display: none; flex-direction: column;
+  backdrop-filter: blur(8px);
+}
+#city-picker.open { display: flex; }
+.city-picker-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 20px 16px; border-bottom: 1px solid var(--border-light); }
+.city-picker-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; color: var(--text); }
+.city-picker-close { background: var(--beige); border: 1px solid var(--beige-deep); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: var(--text-med); }
+.city-picker-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.city-option { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; cursor: pointer; transition: background 0.15s; font-size: 15px; font-weight: 500; color: var(--text-med); border-radius: 12px; margin: 0 8px; }
+.city-option:hover { background: var(--beige); color: var(--text); }
+.city-option.active { color: var(--terra); background: var(--beige); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white;
+  padding: 10px 20px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all 0.3s; z-index: 500;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── UTILITIES ── */
+.hidden { display: none !important; }
+@media (min-width: 500px) {
+  body { max-width: 430px; margin: 0 auto; box-shadow: 0 0 60px rgba(42,31,20,0.1); min-height: 100vh; }
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="logo-icon">🗝️</div>
+  <h1>Vault</h1>
+  <p>Loading your city...</p>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- ══ DISCOVER SCREEN ══ -->
+  <div id="discover-screen" class="screen active">
+    <div class="screen-header">
+      <div>
+        <div class="screen-subtitle">Now exploring</div>
+        <button id="city-btn" onclick="openCityPicker()">
+          <span id="city-display">Los Angeles</span>
+          <span class="chevron">▾</span>
+        </button>
+      </div>
+      <div class="header-right">
+        <div class="vegan-toggle-wrap" onclick="toggleVegan()">
+          <div class="toggle-track" id="vegan-track"><div class="toggle-thumb"></div></div>
+          <div class="vegan-toggle-label" id="vegan-label">🌱 VEGAN</div>
+        </div>
+        <div class="keys-box">
+          <span class="keys-count" id="keys-display">3</span>
+          <span class="keys-label">Keys</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-row">
+        <span class="progress-label">Vault progress</span>
+        <span class="progress-count" id="progress-text">0/12 unlocked</span>
+      </div>
+      <div class="progress-bg"><div class="progress-fill" id="progress-fill" style="width:33%"></div></div>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">◎</span>
+      <input type="text" id="search-input" placeholder="Search spots or neighborhoods..." oninput="filterSpots()">
+    </div>
+
+    <div class="filter-row" id="filter-row">
+      <button class="filter-chip active" onclick="setFilter('All',this)">All</button>
+      <button class="filter-chip vegan" onclick="setFilter('Vegan',this)">🌱 Vegan</button>
+      <button class="filter-chip" onclick="setFilter('Restaurant',this)">Restaurant</button>
+      <button class="filter-chip" onclick="setFilter('Café',this)">Café</button>
+      <button class="filter-chip" onclick="setFilter('Bar',this)">Bar</button>
+      <button class="filter-chip" onclick="setFilter('Viewpoint',this)">Viewpoint</button>
+      <button class="filter-chip" onclick="setFilter('Gallery',this)">Gallery</button>
+      <button class="filter-chip" onclick="setFilter('Park',this)">Park</button>
+    </div>
+
+    <div id="vegan-banner" class="vegan-banner hidden">🌱 Showing vegan-friendly spots only</div>
+    <div id="free-banner" class="free-banner">🌱 All vegan spots are free. <a onclick="openPricing()">Upgrade for everything →</a></div>
+
+    <div class="spot-list">
+      <div id="featured-hero-wrap"></div>
+      <div class="section-label" id="vault-label">The Vault — 12 spots</div>
+      <div id="spot-list-content"></div>
+    </div>
+  </div>
+
+  <!-- ══ MAP SCREEN ══ -->
+  <div id="map-screen" class="screen">
+    <div class="screen-header" style="margin-bottom:12px">
+      <div>
+        <div class="screen-subtitle">Hidden spots near you</div>
+        <div class="screen-title" id="map-city-title">Los Angeles</div>
+      </div>
+      <button onclick="openCityPicker()" style="background:var(--beige);border:1px solid var(--beige-deep);border-radius:100px;padding:7px 14px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--text-med);cursor:pointer">Change ▾</button>
+    </div>
+
+    <div class="map-container" id="map-container">
+      <svg class="map-svg" viewBox="0 0 375 340" id="map-svg">
+        <!-- Map background -->
+        <rect width="375" height="340" fill="#f5efe6"/>
+        <!-- Grid roads -->
+        <g stroke="#e8ddd0" stroke-width="1.5" fill="none">
+          <line x1="0" y1="52" x2="375" y2="52"/>
+          <line x1="0" y1="95" x2="375" y2="95"/>
+          <line x1="0" y1="130" x2="375" y2="130"/>
+          <line x1="0" y1="170" x2="375" y2="170"/>
+          <line x1="0" y1="210" x2="375" y2="210"/>
+          <line x1="0" y1="248" x2="375" y2="248"/>
+          <line x1="0" y1="290" x2="375" y2="290"/>
+          <line x1="37" y1="0" x2="37" y2="340"/>
+          <line x1="82" y1="0" x2="82" y2="340"/>
+          <line x1="128" y1="0" x2="128" y2="340"/>
+          <line x1="172" y1="0" x2="172" y2="340"/>
+          <line x1="210" y1="0" x2="210" y2="340"/>
+          <line x1="254" y1="0" x2="254" y2="340"/>
+          <line x1="295" y1="0" x2="295" y2="340"/>
+          <line x1="335" y1="0" x2="335" y2="340"/>
+        </g>
+        <!-- Major roads -->
+        <g stroke="#ddd0c4" stroke-width="3" fill="none">
+          <line x1="0" y1="113" x2="375" y2="113"/>
+          <line x1="0" y1="224" x2="375" y2="224"/>
+          <line x1="105" y1="0" x2="105" y2="340"/>
+          <line x1="240" y1="0" x2="240" y2="340"/>
+        </g>
+        <!-- Freeway diagonals -->
+        <line x1="0" y1="100" x2="225" y2="290" stroke="#ccc0b4" stroke-width="4" fill="none"/>
+        <line x1="75" y1="0" x2="340" y2="240" stroke="#ccc0b4" stroke-width="3.5" fill="none"/>
+        <!-- Blocks -->
+        <rect x="18" y="18" width="45" height="60" fill="#ede6dc" rx="2"/>
+        <rect x="90" y="28" width="30" height="42" fill="#e8e0d4" rx="2"/>
+        <rect x="180" y="52" width="38" height="68" fill="#ede6dc" rx="2"/>
+        <rect x="263" y="18" width="52" height="56" fill="#e8e0d4" rx="2"/>
+        <rect x="30" y="120" width="56" height="74" fill="#e8e0d4" rx="2"/>
+        <rect x="131" y="136" width="45" height="62" fill="#ede6dc" rx="2"/>
+        <rect x="225" y="102" width="52" height="85" fill="#e8e0d4" rx="2"/>
+        <rect x="308" y="119" width="38" height="68" fill="#ede6dc" rx="2"/>
+        <rect x="45" y="218" width="60" height="62" fill="#e8e0d4" rx="2"/>
+        <rect x="158" y="232" width="38" height="54" fill="#ede6dc" rx="2"/>
+        <rect x="255" y="210" width="60" height="68" fill="#e8e0d4" rx="2"/>
+        <!-- Parks (green) -->
+        <rect x="113" y="68" width="38" height="48" fill="#d8e8d0" rx="4"/>
+        <rect x="270" y="190" width="30" height="34" fill="#d8e8d0" rx="4"/>
+        <rect x="56" y="265" width="34" height="42" fill="#d8e8d0" rx="4"/>
+        <!-- Water -->
+        <path d="M0 265 Q140 280 188 258 Q268 238 375 272 L375 340 L0 340 Z" fill="#c8dce8"/>
+        <!-- Labels -->
+        <text x="235" y="75" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">SILVER LAKE</text>
+        <text x="195" y="144" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">ECHO PARK</text>
+        <text x="150" y="194" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">DOWNTOWN</text>
+        <text x="100" y="158" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">KOREATOWN</text>
+        <text x="258" y="160" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">ARTS DIST</text>
+        <text x="18" y="88" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">CULVER</text>
+        <text x="285" y="50" font-family="Syne" font-size="9" fill="#c0a890" font-weight="700" letter-spacing="1">LOS FELIZ</text>
+        <text x="60" y="304" font-family="Syne" font-size="8" fill="#8ab4c8" font-weight="600">Pacific Ocean</text>
+      </svg>
+      <!-- Pins rendered by JS -->
+      <div id="map-pins" style="position:absolute;inset:0;"></div>
+      <!-- Count pill -->
+      <div style="position:absolute;top:12px;left:12px;background:rgba(255,255,255,0.92);border-radius:100px;padding:5px 12px;border:1px solid var(--border-light);font-size:11px;font-weight:700;color:var(--text-med);" id="map-count">6 spots visible</div>
+    </div>
+
+    <div style="padding:0 20px 16px">
+      <div class="section-label" id="map-bottom-label">Tap a pin to preview</div>
+      <div class="spot-cards-row" id="map-cards-row"></div>
+    </div>
+  </div>
+
+  <!-- ══ EVENTS SCREEN ══ -->
+  <div id="events-screen" class="screen">
+    <div class="screen-header" style="margin-bottom:4px">
+      <div>
+        <div class="screen-subtitle">Exclusive access</div>
+        <div class="screen-title">Secret Events</div>
+      </div>
+    </div>
+    <div class="free-banner" style="margin-top:12px">💡 Spots host secret events here. Vault takes 15% of every ticket sold.</div>
+    <div class="events-list" id="events-list"></div>
+  </div>
+
+  <!-- ══ SAVED SCREEN ══ -->
+  <div id="saved-screen" class="screen">
+    <div class="screen-header" style="margin-bottom:4px">
+      <div>
+        <div class="screen-subtitle">Your collection</div>
+        <div class="screen-title">Saved Spots</div>
+      </div>
+    </div>
+    <div class="saved-list" id="saved-list"></div>
+  </div>
+
+  <!-- ══ PROFILE SCREEN ══ -->
+  <div id="profile-screen" class="screen">
+    <div class="screen-header" style="margin-bottom:4px">
+      <div>
+        <div class="screen-subtitle">Your identity</div>
+        <div class="screen-title">Profile</div>
+      </div>
+    </div>
+    <div class="profile-content">
+      <div class="profile-card">
+        <div class="profile-avatar">🕵️</div>
+        <div>
+          <div class="profile-name">Anonymous Explorer</div>
+          <div class="profile-since">Member since May 2026</div>
+        </div>
+        <div class="tier-badge free" id="tier-badge">FREE VEGAN</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><span class="stat-value" id="stat-unlocked">4</span><div class="stat-lbl">Unlocked</div></div>
+        <div class="stat-box"><span class="stat-value" id="stat-saved">0</span><div class="stat-lbl">Saved</div></div>
+        <div class="stat-box"><span class="stat-value" id="stat-keys">3</span><div class="stat-lbl">Keys</div></div>
+      </div>
+      <div class="section-label">Earn More Keys</div>
+      <div class="earn-list">
+        <div class="earn-item">
+          <span class="earn-check" style="color:var(--text-light)">○</span>
+          <span class="earn-action">Submit a hidden spot</span>
+          <span class="earn-reward">+2 Keys</span>
+        </div>
+        <div class="earn-item">
+          <span class="earn-check" style="color:var(--text-light)">○</span>
+          <span class="earn-action">Submit a vegan spot 🌱</span>
+          <span class="earn-reward">+3 Keys</span>
+        </div>
+        <div class="earn-item">
+          <span class="earn-check" style="color:var(--green)">✓</span>
+          <span class="earn-action done">Visit & check in</span>
+          <span class="earn-reward done">+1 Key</span>
+        </div>
+        <div class="earn-item">
+          <span class="earn-check" style="color:var(--text-light)">○</span>
+          <span class="earn-action">Refer a friend</span>
+          <span class="earn-reward">+3 Keys</span>
+        </div>
+        <div class="earn-item">
+          <span class="earn-check" style="color:var(--green)">✓</span>
+          <span class="earn-action done">Add a photo</span>
+          <span class="earn-reward done">+1 Key</span>
+        </div>
+      </div>
+      <button class="upgrade-btn" onclick="openPricing()">Get Vault Pass — Unlimited Access 🗝️</button>
+    </div>
+  </div>
+
+  <!-- ══ DETAIL SCREEN ══ -->
+  <div id="detail-screen">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">←</button>
+      <div class="detail-neighborhood" id="detail-neighborhood">Neighborhood</div>
+      <button class="save-btn-inline" id="detail-save-btn" onclick="toggleDetailSave()">♡</button>
+    </div>
+    <div class="detail-hero" id="detail-hero">📍</div>
+    <div class="detail-content">
+      <div class="tag-row" id="detail-tags"></div>
+      <div class="detail-name" id="detail-name">Spot Name</div>
+      <div class="detail-location" id="detail-location">Neighborhood · City</div>
+      <div class="divider"></div>
+      <div class="section-sublabel">About</div>
+      <div class="detail-desc" id="detail-desc"></div>
+      <div id="detail-secret-section"></div>
+      <div class="divider"></div>
+      <div class="detail-stats">
+        <div class="detail-stat"><span class="detail-stat-value" id="detail-saves">0</span><div class="detail-stat-label">Saves</div></div>
+        <div class="detail-stat"><span class="detail-stat-value" style="color:var(--green)">Verified ✓</span><div class="detail-stat-label">Status</div></div>
+        <div class="detail-stat"><span class="detail-stat-value" id="detail-tier">Tier 1</span><div class="detail-stat-label">Level</div></div>
+      </div>
+      <div id="detail-vegan-verified" class="vegan-verified hidden">🌱 <span>100% vegan-friendly. Verified by the Vault community.</span></div>
+      <button class="directions-btn" id="detail-directions-btn">Get Directions</button>
+      <button class="outline-btn" id="detail-outline-btn" onclick="toggleDetailSave()">Save This Spot</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" onclick="switchTab('discover',this)"><span class="nav-icon">✦</span><span class="nav-label">Discover</span></button>
+    <button class="nav-btn" onclick="switchTab('map',this)"><span class="nav-icon">◎</span><span class="nav-label">Map</span></button>
+    <button class="nav-btn" onclick="switchTab('events',this)"><span class="nav-icon">◈</span><span class="nav-label">Events</span></button>
+    <button class="nav-btn" onclick="switchTab('saved',this)"><span class="nav-icon">♡</span><span class="nav-label">Saved</span></button>
+    <button class="nav-btn" onclick="switchTab('profile',this)"><span class="nav-icon">○</span><span class="nav-label">Profile</span></button>
+  </nav>
+</div>
+
+<!-- PRICING MODAL -->
+<div id="pricing-screen">
+  <div class="pricing-content">
+    <div class="pricing-header">
+      <button class="back-btn" onclick="closePricing()">←</button>
+      <div>
+        <div class="screen-subtitle">Unlock everything</div>
+        <div class="screen-title" style="font-size:24px">Choose Your Plan</div>
+      </div>
+    </div>
+
+    <!-- Free Vegan -->
+    <div class="plan-box green">
+      <div class="plan-header-row">
+        <div><div class="plan-name">Free Vegan 🌱</div><div class="plan-sub">Perfect for plant-based explorers</div></div>
+        <div><div class="plan-price green">$0</div><div class="plan-period">forever</div></div>
+      </div>
+      <div class="feature-row"><span class="feature-icon green">✓</span><span class="feature-text">All vegan spots — every city, forever free</span></div>
+      <div class="feature-row"><span class="feature-icon green">✓</span><span class="feature-text">🌱 Vegan filter across all cities</span></div>
+      <div class="feature-row"><span class="feature-icon green">✓</span><span class="feature-text">3 keys per month to unlock extra spots</span></div>
+      <div class="feature-row"><span class="feature-icon green">✓</span><span class="feature-text">Save favorite spots</span></div>
+      <div class="feature-row"><span class="feature-icon green">✓</span><span class="feature-text">Submit spots & earn keys</span></div>
+      <div style="background:var(--green-light);border:1px solid var(--green-border);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px;font-weight:700;color:var(--green);text-align:center;">Your current plan ✓</div>
+    </div>
+
+    <!-- Vault Pass -->
+    <div class="plan-box featured">
+      <div class="popular-badge">MOST POPULAR</div>
+      <div style="text-align:center;font-size:36px;margin-bottom:6px">🗝️</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--terra);text-align:center;margin-bottom:4px">Vault Pass</div>
+      <div style="font-size:12px;color:var(--text-med);text-align:center;margin-bottom:14px">Unlimited access. No keys needed.</div>
+      <div class="plan-toggle">
+        <div class="plan-toggle-opt active" id="monthly-opt" onclick="selectPlan('monthly')">Monthly</div>
+        <div class="plan-toggle-opt" id="yearly-opt" onclick="selectPlan('yearly')">Yearly<span class="save-pill">-40%</span></div>
+      </div>
+      <div style="text-align:center;margin-bottom:14px">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:var(--terra)" id="vault-price">$6.99</span>
+        <span style="font-size:14px;color:var(--text-light)" id="vault-period">/month</span>
+      </div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Everything in Free Vegan</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">All spots — vegan & non-vegan</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Unlimited key usage</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Secret events & ticket booking</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Curator application access</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">No ads. Ever.</span></div>
+      <button class="plan-cta" onclick="handlePurchase()">Get Vault Pass</button>
+    </div>
+
+    <!-- Business -->
+    <div class="plan-box">
+      <div class="plan-header-row">
+        <div><div class="plan-name">For Businesses</div><div class="plan-sub">Feature your hidden spot</div></div>
+        <div><div class="plan-price terra">$149</div><div class="plan-period">/month</div></div>
+      </div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Appear first in search & map</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Daily featured spot slot</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Host events & sell tickets (15% fee)</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Verified vegan badge available</span></div>
+      <div class="feature-row"><span class="feature-icon">✦</span><span class="feature-text">Gold featured card design</span></div>
+      <button class="plan-cta" style="background:var(--text)" onclick="showToast('Business applications opening soon!')">Apply as a Business →</button>
+    </div>
+
+    <button class="restore-btn" onclick="showToast('No previous purchases found.')">Restore Purchases</button>
+    <p class="legal-text">Cancel anytime. Payment processed securely. By subscribing you agree to our Terms of Service.</p>
+  </div>
+</div>
+
+<!-- CITY PICKER -->
+<div id="city-picker">
+  <div class="city-picker-header">
+    <div class="city-picker-title">Choose City</div>
+    <button class="city-picker-close" onclick="closeCityPicker()">✕</button>
+  </div>
+  <div class="city-picker-list" id="city-list"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════
+
+const SPOTS = [
+  { id:1, name:"The Blind Rabbit", cat:"Bar", hood:"Arts District", city:"Los Angeles", desc:"An unmarked speakeasy most people walk right past in the Arts District.", secret:"No sign. No menu online. Knock twice on the unmarked door on Traction Ave. Password changes weekly — follow their hidden Instagram for clues.", vibe:"Speakeasy", vegan:false, featured:false, locked:false, saves:847, tier:1, emoji:"🍸", px:72, py:58 },
+  { id:2, name:"Kumquat Coffee", cat:"Café", hood:"Silver Lake", city:"Los Angeles", desc:"A tiny plant-based café hidden behind a flower shop serving just 20 cups a day.", secret:"Walk through Bloom Florals on Sunset. The café is in the back courtyard. The owner hand-pours every cup. Arrive before 9am or you will miss out.", vibe:"Intimate", vegan:true, featured:true, locked:false, saves:1203, tier:1, emoji:"☕", px:63, py:24 },
+  { id:3, name:"The Roof Nobody Knows", cat:"Viewpoint", hood:"Downtown", city:"Los Angeles", desc:"An unlocked rooftop in DTLA with the best view of the skyline nobody talks about.", secret:"Take the freight elevator in the parking structure at 5th and Spring. Press R. Door at the top is always unlocked before midnight.", vibe:"Secret", vegan:true, featured:false, locked:false, saves:634, tier:1, emoji:"🌆", px:43, py:52 },
+  { id:4, name:"Mariscos El Veneno", cat:"Restaurant", hood:"Boyle Heights", city:"Los Angeles", desc:"A widow's kitchen, open Friday nights only. Twelve seats. The aguachile will ruin you for all others.", secret:"The house is unmarked on Cesar Chavez. Look for the blue tarp over the driveway. Cash only. They run out by 9pm every time.", vibe:"Local Legend", vegan:false, featured:true, locked:false, saves:2109, tier:1, emoji:"🦞", px:58, py:62 },
+  { id:5, name:"The Green Altar", cat:"Restaurant", hood:"Echo Park", city:"Los Angeles", desc:"100% plant-based kitchen with no sign on the door.", secret:"Black door on Alvarado St. Ring the bell three times. The mushroom birria is the move. Cash only. Fridays and Saturdays only.", vibe:"Underground", vegan:true, featured:true, locked:false, saves:1876, tier:1, emoji:"🌿", px:46, py:38 },
+  { id:6, name:"Roots & Ritual", cat:"Café", hood:"Silver Lake", city:"Los Angeles", desc:"Every drink is fully plant-based. The lavender is grown on the roof.", secret:"Side alley off Sunset. Look for the small potted olive tree at the entrance. Ask for the seasonal menu — it is not posted anywhere online.", vibe:"Serene", vegan:true, featured:false, locked:false, saves:923, tier:1, emoji:"🌱", px:68, py:19 },
+  { id:7, name:"Studio 1200", cat:"Gallery", hood:"Culver City", city:"Los Angeles", desc:"Artist collective open only when the red light above the door is on.", secret:"Ring the bell at 1200 National Blvd. Tell them you heard about it from the collective. They only let in people who know to ring. No cameras allowed inside.", vibe:"Underground", vegan:false, featured:false, locked:true, saves:412, tier:2, emoji:"🎨", px:18, py:60 },
+  { id:8, name:"The Cactus Garden", cat:"Park", hood:"Griffith", city:"Los Angeles", desc:"A hidden section of Griffith Park most hikers never find.", secret:"At mile marker 2 on the Bee Rock trail, look for the unmarked dirt path heading left. Follow it for 8 minutes. You will know when you arrive.", vibe:"Hidden Nature", vegan:true, featured:false, locked:true, saves:789, tier:2, emoji:"🌵", px:38, py:17 },
+  { id:9, name:"Noodle Basement", cat:"Restaurant", hood:"Koreatown", city:"Los Angeles", desc:"Down the stairs, past the karaoke rooms. 40 bowls a night. No substitutions.", secret:"Enter the building on 6th and Vermont. Take the stairs all the way down. Walk past the karaoke rooms. There is no sign. Knock on the red door.", vibe:"No-frills", vegan:false, featured:false, locked:true, saves:556, tier:2, emoji:"🍜", px:36, py:49 },
+  { id:10, name:"The Salt Room", cat:"Bar", hood:"Echo Park", city:"Los Angeles", desc:"Mezcal and natural wine. The bartender decides your drink based on your mood.", secret:"The building has no number. It is between the laundromat and the taqueria on Glendale Blvd. Text the number on the QR code outside for a reservation.", vibe:"Ritual", vegan:false, featured:false, locked:true, saves:334, tier:3, emoji:"🧂", px:50, py:42 },
+  { id:11, name:"Midnight Bodega", cat:"Café", hood:"Highland Park", city:"Los Angeles", desc:"Opens at 11pm. Closes when the last person leaves. Bring something to read.", secret:"Look for the yellow porch light on Figueroa. There is no sign. The owner plays records all night. Vegan pastries made fresh at midnight.", vibe:"Late Night", vegan:true, featured:false, locked:true, saves:891, tier:3, emoji:"🌙", px:75, py:12 },
+  { id:12, name:"Terra Firma", cat:"Restaurant", hood:"Los Feliz", city:"Los Angeles", desc:"Chef's table, plant-based only. Six guests max. Reservation by DM only.", secret:"Follow @terrafirmaLA on Instagram. DM them the word 'soil' for availability. Six seats. The menu is whatever was at the market that morning.", vibe:"Exclusive", vegan:true, featured:false, locked:true, saves:1102, tier:3, emoji:"🫚", px:74, py:30 },
+];
+
+const EVENTS = [
+  { id:1, spotName:"Kumquat Coffee", emoji:"☕", title:"After-Hours Cupping Session", desc:"20 guests max. Six single-origin coffees, guided tasting, blind comparison. Bring your palette.", date:"May 10", time:"9pm", price:45, spotsLeft:4, vegan:true, tag:"Sold Out Soon" },
+  { id:2, spotName:"The Blind Rabbit", emoji:"🍸", title:"Secret Menu Night", desc:"The bartender reveals the full hidden menu. Only happens twice a year. No photos allowed inside.", date:"May 14", time:"8pm", price:35, spotsLeft:12, vegan:false, tag:"Popular" },
+  { id:3, spotName:"The Green Altar", emoji:"🌿", title:"Plant-Based Chef's Table", desc:"Six guests. The chef cooks based on what's at the market that morning. You won't know the menu until you arrive.", date:"May 17", time:"7pm", price:110, spotsLeft:2, vegan:true, tag:"Almost Gone" },
+  { id:4, spotName:"Roots & Ritual", emoji:"🌱", title:"Sunrise Meditation + Drinks", desc:"Rooftop at 6am. 15 guests. Guided breathwork followed by the best coffee of your life.", date:"May 21", time:"6am", price:28, spotsLeft:8, vegan:true, tag:"New" },
+  { id:5, spotName:"Studio 1200", emoji:"🎨", title:"Midnight Gallery Opening", desc:"The artist collective opens to 30 guests only. Works are for sale. Cash only. No press.", date:"May 24", time:"11pm", price:0, spotsLeft:14, vegan:false, tag:"Free" },
+];
+
+const CITIES = ["Los Angeles","New York","Tokyo","London","Paris","Chicago","Miami","Berlin","Seoul","Mexico City"];
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+
+let state = {
+  city: "Los Angeles",
+  filter: "All",
+  veganOnly: false,
+  searchText: "",
+  keys: 3,
+  savedIds: new Set(),
+  unlockedIds: new Set([1,2,3,4,5,6]),
+  tier: "free_vegan",
+  selectedPlan: "monthly",
+  currentDetailId: null,
+};
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      renderAll();
+    }, 600);
+  }, 1800);
+});
+
+function renderAll() {
+  renderSpots();
+  renderMap();
+  renderEvents();
+  renderSaved();
+  renderCityList();
+  updateProgress();
+  updateStats();
+}
+
+// ════════════════════════════════════════════════
+// SPOTS
+// ════════════════════════════════════════════════
+
+function getFilteredSpots() {
+  return SPOTS.filter(s => {
+    const matchCat = state.filter === "All" ? true : state.filter === "Vegan" ? s.vegan : s.cat === state.filter;
+    const matchVegan = state.veganOnly ? s.vegan : true;
+    const matchSearch = s.name.toLowerCase().includes(state.searchText.toLowerCase()) || s.hood.toLowerCase().includes(state.searchText.toLowerCase());
+    return matchCat && matchVegan && matchSearch;
+  });
+}
+
+function canAccess(spot) {
+  if (state.tier === "vault_pass") return true;
+  return spot.vegan; // Free tier can see all vegan spots
+}
+
+function isUnlocked(spot) {
+  return state.unlockedIds.has(spot.id);
+}
+
+function renderSpots() {
+  const spots = getFilteredSpots();
+  const featured = spots.find(s => s.featured && canAccess(s) && isUnlocked(s));
+
+  // Featured hero
+  const heroWrap = document.getElementById('featured-hero-wrap');
+  if (featured && state.filter === "All" && !state.veganOnly) {
+    heroWrap.innerHTML = `
+      <div class="section-label">Today's Feature</div>
+      <div class="featured-hero" onclick="openDetail(${featured.id})">
+        <div class="spot-row">
+          <div class="spot-emoji ${featured.vegan?'vegan':''}" style="width:52px;height:52px;border-radius:14px;font-size:26px">${featured.emoji}</div>
+          <div class="spot-info">
+            <div class="tag-row">
+              <span class="featured-tag">✦ Featured</span>
+              ${featured.vegan?'<span class="vegan-tag">🌱 Vegan</span>':''}
+            </div>
+            <div class="spot-name">${featured.name}</div>
+            <div class="spot-neighborhood">${featured.hood}</div>
+          </div>
+        </div>
+        <div class="spot-desc" style="font-style:italic">${featured.desc}</div>
+      </div>
+    `;
+  } else { heroWrap.innerHTML = ''; }
+
+  // Vault label
+  document.getElementById('vault-label').textContent = `${state.filter==='All'?'The Vault':state.filter} — ${spots.length} spots`;
+
+  // Spot list
+  const el = document.getElementById('spot-list-content');
+  if (spots.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-title">No spots found</div><div class="empty-sub">Try a different filter or city</div></div>`;
+    return;
+  }
+
+  el.innerHTML = spots.map(spot => {
+    const accessible = canAccess(spot);
+    const unlocked = isUnlocked(spot);
+    const showSecret = accessible && unlocked;
+    const saved = state.savedIds.has(spot.id);
+
+    return `
+      <div class="spot-card ${spot.featured&&accessible?'featured':''} ${spot.vegan&&accessible&&!spot.featured?'vegan':''} ${!accessible?'locked':''}" 
+           onclick="${accessible ? `openDetail(${spot.id})` : 'openPricing()'}">
+        ${!accessible ? `
+          <div class="lock-overlay">
+            <div class="lock-overlay-emoji">🔒</div>
+            <div class="lock-overlay-text">Vault Pass required</div>
+            <button class="lock-overlay-btn" onclick="event.stopPropagation();openPricing()">Upgrade →</button>
+          </div>` : ''}
+        <div class="spot-row">
+          <div class="spot-emoji ${spot.vegan?'vegan':''}">${spot.emoji}</div>
+          <div class="spot-info">
+            <div class="tag-row">
+              <span class="cat-tag">${spot.cat}</span>
+              ${spot.vegan?'<span class="vegan-tag">🌱 Vegan</span>':''}
+              ${spot.featured?'<span class="featured-tag">✦</span>':''}
+            </div>
+            <div class="spot-name">${spot.name}</div>
+            <div class="spot-neighborhood">${spot.hood}</div>
+          </div>
+          <button class="save-btn-inline ${saved?'saved':''}" onclick="event.stopPropagation();toggleSave(${spot.id})">${saved?'♥':'♡'}</button>
+        </div>
+        ${accessible ? `<div class="spot-desc">${showSecret ? '"'+spot.secret+'"' : spot.desc}</div>` : ''}
+        <div class="spot-footer">
+          <span class="spot-tier">Tier ${spot.tier}</span>
+          <span class="spot-saves">${spot.saves.toLocaleString()} saves</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterSpots() {
+  state.searchText = document.getElementById('search-input').value;
+  renderSpots();
+}
+
+function setFilter(cat, btn) {
+  state.filter = cat;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderSpots();
+}
+
+function toggleVegan() {
+  state.veganOnly = !state.veganOnly;
+  const track = document.getElementById('vegan-track');
+  const label = document.getElementById('vegan-label');
+  track.classList.toggle('on', state.veganOnly);
+  label.classList.toggle('on', state.veganOnly);
+  document.getElementById('vegan-banner').classList.toggle('hidden', !state.veganOnly);
+  renderSpots();
+}
+
+function toggleSave(id) {
+  if (state.savedIds.has(id)) {
+    state.savedIds.delete(id);
+    showToast('Removed from saved');
+  } else {
+    state.savedIds.add(id);
+    showToast('Spot saved! ♥');
+  }
+  renderSpots();
+  renderSaved();
+  updateStats();
+  if (state.currentDetailId === id) updateDetailSaveBtn();
+}
+
+// ════════════════════════════════════════════════
+// DETAIL
+// ════════════════════════════════════════════════
+
+function openDetail(id) {
+  const spot = SPOTS.find(s => s.id === id);
+  if (!spot) return;
+  state.currentDetailId = id;
+
+  const accessible = canAccess(spot);
+  const unlocked = isUnlocked(spot);
+
+  // Hide screens, show detail
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('nav').style.display = 'none';
+  const detail = document.getElementById('detail-screen');
+  detail.classList.add('active');
+  detail.style.display = 'block';
+
+  // Populate
+  document.getElementById('detail-neighborhood').textContent = spot.hood;
+  const hero = document.getElementById('detail-hero');
+  hero.textContent = spot.emoji;
+  hero.className = `detail-hero ${spot.vegan ? 'vegan' : ''}`;
+
+  // Tags
+  document.getElementById('detail-tags').innerHTML = `
+    <span class="cat-tag">${spot.cat}</span>
+    ${spot.vegan ? '<span class="vegan-tag">🌱 Vegan Friendly</span>' : ''}
+    ${spot.featured ? '<span class="featured-tag">✦ Featured</span>' : ''}
+    <span style="background:var(--beige);border:1px solid var(--beige-deep);border-radius:100px;padding:2px 8px;font-size:10px;font-weight:500;color:var(--text-med)">${spot.vibe}</span>
+  `;
+
+  document.getElementById('detail-name').textContent = spot.name;
+  document.getElementById('detail-location').textContent = `${spot.hood} · ${spot.city}`;
+  document.getElementById('detail-desc').textContent = spot.desc;
+  document.getElementById('detail-saves').textContent = spot.saves.toLocaleString();
+  document.getElementById('detail-tier').textContent = `Tier ${spot.tier}`;
+
+  // Vegan verified
+  document.getElementById('detail-vegan-verified').classList.toggle('hidden', !spot.vegan);
+
+  // Directions button
+  const dirBtn = document.getElementById('detail-directions-btn');
+  dirBtn.className = `directions-btn ${spot.vegan ? 'vegan' : ''}`;
+
+  // Secret section
+  const secretSection = document.getElementById('detail-secret-section');
+  if (!accessible) {
+    secretSection.innerHTML = `
+      <div class="unlock-box">
+        <div class="unlock-box-emoji">🗝️</div>
+        <div class="unlock-box-title">Vault Pass Required</div>
+        <div class="unlock-box-sub">This spot is only available to Vault Pass members</div>
+        <button class="unlock-box-btn" onclick="openPricing()">Get Vault Pass →</button>
+      </div>`;
+  } else if (!unlocked && spot.tier_required > 1) {
+    secretSection.innerHTML = `
+      <div class="unlock-box">
+        <div class="unlock-box-emoji">🔒</div>
+        <div class="unlock-box-title">Unlock the secret</div>
+        <div class="unlock-box-sub">Uses 1 key · You have ${state.keys} remaining</div>
+        <button class="unlock-box-btn" onclick="unlockSpot(${spot.id})">Unlock — 1 Key</button>
+      </div>`;
+  } else {
+    secretSection.innerHTML = `
+      <div class="secret-box ${spot.vegan ? 'vegan' : ''}">
+        <div class="secret-label">🗝️ The Secret</div>
+        <div class="secret-text">"${spot.secret}"</div>
+      </div>`;
+  }
+
+  updateDetailSaveBtn();
+  window.scrollTo(0, 0);
+}
+
+function updateDetailSaveBtn() {
+  const id = state.currentDetailId;
+  const saved = state.savedIds.has(id);
+  const btn = document.getElementById('detail-save-btn');
+  if (btn) btn.textContent = saved ? '♥' : '♡';
+  btn.style.color = saved ? 'var(--terra)' : 'var(--text-light)';
+  const outlineBtn = document.getElementById('detail-outline-btn');
+  if (outlineBtn) outlineBtn.textContent = saved ? 'Remove from Saved' : 'Save This Spot';
+}
+
+function toggleDetailSave() {
+  toggleSave(state.currentDetailId);
+}
+
+function closeDetail() {
+  document.getElementById('detail-screen').style.display = 'none';
+  document.getElementById('detail-screen').classList.remove('active');
+  document.getElementById('nav').style.display = 'flex';
+  // Restore active tab
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('discover-screen').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  state.currentDetailId = null;
+}
+
+function unlockSpot(id) {
+  if (state.keys <= 0) {
+    showToast('No keys left! Earn more or upgrade.');
+    return;
+  }
+  state.keys--;
+  state.unlockedIds.add(id);
+  document.getElementById('keys-display').textContent = state.keys;
+  document.getElementById('stat-keys').textContent = state.keys;
+  updateProgress();
+  showToast('🗝️ Spot unlocked!');
+  openDetail(id); // Re-render with unlocked state
+}
+
+// ════════════════════════════════════════════════
+// MAP
+// ════════════════════════════════════════════════
+
+function renderMap() {
+  const pinsEl = document.getElementById('map-pins');
+  const unlocked = SPOTS.filter(s => isUnlocked(s) && canAccess(s));
+  const locked = SPOTS.filter(s => !isUnlocked(s) || !canAccess(s));
+
+  document.getElementById('map-count').textContent = `${unlocked.length} spots visible`;
+
+  pinsEl.innerHTML = [...unlocked, ...locked].map(spot => {
+    const accessible = canAccess(spot);
+    const uld = isUnlocked(spot);
+    const color = !accessible || !uld ? '#b0a090' : spot.vegan ? '#4a7c4e' : '#c4522a';
+    const emoji = !accessible || !uld ? '🔒' : spot.emoji;
+    return `
+      <div class="map-pin" style="position:absolute;left:${spot.px}%;top:${spot.py}%;transform:translate(-50%,-100%);cursor:pointer;transition:transform 0.2s;z-index:${uld?10:5}"
+           onclick="${uld && accessible ? `openDetailFromMap(${spot.id})` : 'openPricing()'}">
+        <div style="width:34px;height:34px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.2);">${emoji}</div>
+        <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid ${color};margin:0 auto;"></div>
+      </div>
+    `;
+  }).join('');
+
+  // Mini cards
+  const cardsEl = document.getElementById('map-cards-row');
+  cardsEl.innerHTML = SPOTS.filter(s => isUnlocked(s) && canAccess(s)).slice(0,5).map(spot => `
+    <div class="mini-card" onclick="openDetailFromMap(${spot.id})">
+      <div class="mini-card-emoji">${spot.emoji}</div>
+      <div class="mini-card-name">${spot.name}</div>
+      <div class="mini-card-hood">${spot.hood}</div>
+      ${spot.vegan ? '<span class="vegan-tag" style="font-size:9px;padding:2px 6px;margin-top:5px;display:inline-block">🌱</span>' : ''}
+    </div>
+  `).join('');
+}
+
+function openDetailFromMap(id) {
+  openDetail(id);
+}
+
+// ════════════════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════════════════
+
+function renderEvents() {
+  const el = document.getElementById('events-list');
+  el.innerHTML = EVENTS.map(ev => `
+    <div class="event-card" onclick="showToast('Tickets coming soon — sign up to be notified!')">
+      <div class="event-header">
+        <div class="event-emoji ${ev.vegan?'':''}">  ${ev.emoji}</div>
+        <div class="event-info">
+          <div class="event-spot">${ev.spotName}${ev.vegan?' · 🌱':''}</div>
+          <div class="event-title">${ev.title}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:10px">
+          <div class="event-price">${ev.price===0?'Free':'$'+ev.price}</div>
+          <div class="event-price-sub">per person</div>
+        </div>
+      </div>
+      <div class="event-desc">${ev.desc}</div>
+      <div class="event-footer">
+        <div>
+          <div class="event-meta">${ev.date} · ${ev.time}</div>
+          <div class="event-spots">${ev.spotsLeft} spots left</div>
+        </div>
+        <span class="event-tag ${ev.price===0?'free-tag':''}">${ev.tag}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+// SAVED
+// ════════════════════════════════════════════════
+
+function renderSaved() {
+  const el = document.getElementById('saved-list');
+  const saved = SPOTS.filter(s => state.savedIds.has(s.id) && isUnlocked(s));
+  if (saved.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-title">Nothing saved yet.</div><div class="empty-sub">Tap ♡ on any spot to save it.</div></div>`;
+    return;
+  }
+  el.innerHTML = saved.map(spot => `
+    <div class="spot-card ${spot.vegan?'vegan':''}" onclick="openDetail(${spot.id})">
+      <div class="spot-row">
+        <div class="spot-emoji ${spot.vegan?'vegan':''}">${spot.emoji}</div>
+        <div class="spot-info">
+          <div class="tag-row">
+            <span class="cat-tag">${spot.cat}</span>
+            ${spot.vegan?'<span class="vegan-tag">🌱</span>':''}
+          </div>
+          <div class="spot-name">${spot.name}</div>
+          <div class="spot-neighborhood">${spot.hood} · ${spot.city}</div>
+        </div>
+        <button class="save-btn-inline saved" onclick="event.stopPropagation();toggleSave(${spot.id})">♥</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+// CITY
+// ════════════════════════════════════════════════
+
+function renderCityList() {
+  document.getElementById('city-list').innerHTML = CITIES.map(c => `
+    <div class="city-option ${c===state.city?'active':''}" onclick="selectCity('${c}')">
+      <span>${c}</span>
+      ${c===state.city?'<span style="color:var(--terra)">✦</span>':''}
+    </div>
+  `).join('') + `<div style="padding:16px 20px;border-top:1px solid var(--border-light);margin-top:8px;font-size:11px;font-weight:700;color:var(--text-light);text-align:center;letter-spacing:0.08em">More cities launching soon</div>`;
+}
+
+function selectCity(city) {
+  state.city = city;
+  document.getElementById('city-display').textContent = city;
+  document.getElementById('map-city-title').textContent = city;
+  closeCityPicker();
+  showToast(`Now exploring ${city}`);
+  renderSpots();
+}
+
+function openCityPicker() { document.getElementById('city-picker').classList.add('open'); renderCityList(); }
+function closeCityPicker() { document.getElementById('city-picker').classList.remove('open'); }
+
+// ════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════
+
+function switchTab(tab, btn) {
+  // Close detail if open
+  document.getElementById('detail-screen').style.display = 'none';
+  document.getElementById('detail-screen').classList.remove('active');
+  document.getElementById('nav').style.display = 'flex';
+  state.currentDetailId = null;
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab+'-screen').classList.add('active');
+  btn.classList.add('active');
+
+  if (tab === 'map') renderMap();
+  if (tab === 'saved') renderSaved();
+}
+
+// ════════════════════════════════════════════════
+// PRICING
+// ════════════════════════════════════════════════
+
+function openPricing() { document.getElementById('pricing-screen').classList.add('open'); }
+function closePricing() { document.getElementById('pricing-screen').classList.remove('open'); }
+
+function selectPlan(plan) {
+  state.selectedPlan = plan;
+  document.getElementById('monthly-opt').classList.toggle('active', plan==='monthly');
+  document.getElementById('yearly-opt').classList.toggle('active', plan==='yearly');
+  document.getElementById('vault-price').textContent = plan==='monthly' ? '$6.99' : '$49.99';
+  document.getElementById('vault-period').textContent = plan==='monthly' ? '/month' : '/year';
+}
+
+function handlePurchase() {
+  showToast('🎉 Payment processing coming soon! App launching shortly.');
+  closePricing();
+}
+
+// ════════════════════════════════════════════════
+// PROGRESS & STATS
+// ════════════════════════════════════════════════
+
+function updateProgress() {
+  const pct = (state.unlockedIds.size / SPOTS.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${state.unlockedIds.size}/${SPOTS.length} unlocked`;
+}
+
+function updateStats() {
+  document.getElementById('stat-unlocked').textContent = state.unlockedIds.size;
+  document.getElementById('stat-saved').textContent = state.savedIds.size;
+  document.getElementById('stat-keys').textContent = state.keys;
+  document.getElementById('keys-display').textContent = state.keys;
+}
+
+// ════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════
+
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
